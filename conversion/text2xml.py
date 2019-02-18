@@ -48,18 +48,16 @@ def make_text():
 
 def main():
     argparser = argparse.ArgumentParser(description='Convert a plain text document to XML')
-    argparser.add_argument('--infile', type=str, default='crummy.azw3',
+    argparser.add_argument('--infile', type=str, default='../txt/paradijs.txt',
                         help='Path to the input file (raw text, UTF8)')
-    argparser.add_argument('--outfile', type=str, default='crummy.xml',
+    argparser.add_argument('--outfile', type=str, default='../xml/paradijs.xml',
                         help='Path to the output file (.xml)')
     argparser.add_argument('--quote', type=str, default='uk',
                         help='Path to the output file (.xml)')
-    argparser.add_argument('--language', type=str, default='en',
+    argparser.add_argument('--language', type=str, default='nl',
                         help='Path to the output file (.xml)')
     args = argparser.parse_args()
     print(args)
-
-    nlp = spacy.load(args.language)
 
     if args.quote not in ('uk', 'us'):
         raise ValueError('--quote option must be uk or us')
@@ -72,6 +70,7 @@ def main():
 
     with open(args.infile, 'r') as f:
         text = f.read()
+    text = ' '.join(text.split())
     
     div_node = etree.Element('div')
         
@@ -81,6 +80,8 @@ def main():
     just_flushed = False
 
     text = re.sub(r' +', ' ', text)
+
+    nlp = spacy.load(args.language)
     tokens = nlp(text)
 
     if args.quote == 'uk':
@@ -164,7 +165,6 @@ def main():
     with open(args.outfile, 'w') as f:
         f.write(etree.tostring(root, xml_declaration=True,
                                 pretty_print=True, encoding='utf-8').decode())
-
 
 if __name__ == '__main__':
     main()
